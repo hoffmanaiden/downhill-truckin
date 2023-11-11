@@ -8,6 +8,8 @@ import { Stage, OrbitControls, PerspectiveCamera, KeyboardControls } from '@reac
 import { Physics, RigidBody, CuboidCollider } from "@react-three/rapier";
 import Ecctrl, { EcctrlAnimation } from 'ecctrl'
 
+import { BrunoTruck } from './Bruno-truck'
+import { BrunoTruckAxel } from './Bruno-truck-axel'
 import { Model } from './Semi-truck-1'
 
 export default function Home() {
@@ -20,28 +22,28 @@ export default function Home() {
     { name: 'run', keys: ['Shift'] },
   ]
 
-  function Box(props) {
-    // This reference will give us direct access to the mesh
-    const meshRef = useRef()
-    // Set up state for the hovered and active state
-    const [hovered, setHover] = useState(false)
-    const [active, setActive] = useState(false)
-    // Subscribe this component to the render-loop, rotate the mesh every frame
-    useFrame((state, delta) => (meshRef.current.rotation.x += delta))
-    // Return view, these are regular three.js elements expressed in JSX
+  function Wheel(props) {
+    const [hover, setHover] = useState(false);
+    const [spin, setSpin] = useState(false);
+    const wheel1 = useRef();
+
+    const rotate = () => {
+      wheel1.current.applyTorqueImpulse({ x: 0, y: 0, z: 10000 }, true);
+    }
     return (
-      <mesh
-        {...props}
-        ref={meshRef}
-        scale={active ? 1.5 : 1}
-        onClick={(event) => setActive(!active)}
-        onPointerOver={(event) => setHover(true)}
-        onPointerOut={(event) => setHover(false)}>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial color={hovered ? 'hotpink' : 'orange'} />
-      </mesh>
+      <RigidBody colliders={"hull"} restitution={1} args={[0.5]} position={[-12, 10, -12]} rotation={[Math.PI / 2, 0, 0]} ref={wheel1}>
+        <mesh
+          onPointerEnter={() => setHover(true)}
+          onPointerLeave={() => setHover(false)}
+          onClick={rotate}
+        >
+          <cylinderGeometry args={[5, 5, 5, 32]} />
+          <meshStandardMaterial color={hover ? "hotpink" : "royalblue"} />
+        </mesh>
+      </RigidBody>
     )
   }
+
 
   return (
     <Canvas>
@@ -52,13 +54,17 @@ export default function Home() {
             <ambientLight />
             <pointLight position={[10, 10, 10]} />
 
-            <KeyboardControls map={keyboardMap}>
-
+            {/* <KeyboardControls map={keyboardMap}>
               <RigidBody colliders={"hull"} restitution={1} args={[0.5]}>
                 <Model />
               </RigidBody>
+            </KeyboardControls> */}
 
-            </KeyboardControls>
+            <Wheel/>
+
+            <BrunoTruckAxel scale={5}/>
+
+             
 
             <CuboidCollider position={[0, -2, 0]} args={[20, 0.5, 20]} />
 
