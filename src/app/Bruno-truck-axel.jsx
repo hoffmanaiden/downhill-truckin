@@ -5,28 +5,40 @@ Command: npx gltfjsx@6.2.15 .\bruno-truck-axel.glb
 
 import React, { useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
-import { RigidBody, useRevoluteJoint } from "@react-three/rapier"
+import { RigidBody, useRevoluteJoint, useFixedJoint } from "@react-three/rapier"
 
 export function BrunoTruckAxel(props) {
-  const all4Tires = useRef();
   const truckBody = useRef();
+  const frontAxel = useRef();
+  const tire1 = useRef();
+
   const { nodes, materials } = useGLTF('/bruno-truck-axel.glb')
 
   const rotate = () => {
-    all4Tires.current.applyTorqueImpulse({ x: 0, y: 0, z: -100 }, true);
+    tire1.current.applyTorqueImpulse({ x: 0, y: 0, z: -100 }, true);
   }
-  const joint = useRevoluteJoint(all4Tires, truckBody, [
+  const frontAxelJoint = useFixedJoint(truckBody, frontAxel, [
     // Position of the joint in bodyA's local space
     [0, 0, 0],
+    // Orientation of the joint in bodyA's local space
+    [0, 0, 0, 1],
+    // Position of the joint in bodyB's local space
+    [0, 0, 0],
+    // Orientation of the joint in bodyB's local space
+    [0, 0, 0, 1]
+  ])
+  const tire1AxelJoint = useRevoluteJoint(frontAxel, tire1, [
+    // Position of the joint in bodyA's local space
+    [3, 0, 0],
     // Position of the joint in bodyB's local space
     [0, 0, 0],
     // Axis of the joint, expressed in the local-space of
     // the rigid-bodies it is attached to. Cannot be [0,0,0].
-    [0, 1, 0]
+    [0, 10, 0]
   ])
   return (
-    <group {...props} dispose={null} onClick={rotate}>
-      <RigidBody colliders={"hull"} ref={truckBody}>
+    <group {...props} dispose={null} onClick={rotate} position={[0, 10, 0]}>
+      <RigidBody colliders={"hull"} ref={truckBody} restitution={1.5}>
         <mesh geometry={nodes['left-headlight'].geometry} material={materials.light} position={[0.88, 0.214, -0.313]} rotation={[-1.573, 0, Math.PI / 2]} scale={0.422} />
         <mesh geometry={nodes['right-headlight'].geometry} material={materials.light} position={[0.88, 0.215, 0.292]} rotation={[-1.573, 0, Math.PI / 2]} scale={0.422} />
         <mesh geometry={nodes.toplight4.geometry} material={materials.light} position={[-0.204, 0.777, -0.304]} rotation={[-1.573, 0, Math.PI / 2]} scale={0.536} />
@@ -57,22 +69,25 @@ export function BrunoTruckAxel(props) {
         <mesh geometry={nodes.shadeWhite_002001.geometry} material={materials.white} position={[0.35, 0.421, -0.528]} rotation={[-1.573, 0, Math.PI / 2]} scale={0.342} />
         <mesh geometry={nodes.shadeWhite_003001.geometry} material={materials.white} position={[0.35, 0.424, 0.499]} rotation={[1.569, 0, -Math.PI / 2]} scale={-0.342} />
         <mesh geometry={nodes.shadeWhite_007.geometry} material={materials.white} position={[-1.095, 0.199, -0.014]} rotation={[-0.157, -1.565, -1.737]} scale={0.445} />
-        <mesh geometry={nodes.AxelFront.geometry} material={materials.blacktrim} position={[0.525, 0, 0]} />
-        <mesh geometry={nodes.AxelRear.geometry} material={materials['blacktrim.001']} position={[-0.575, 0, 0]} />
       </RigidBody>
-      <RigidBody colliders={"hull"} ref={all4Tires}>
+      <RigidBody ref={frontAxel}>
+        <mesh geometry={nodes.AxelFront.geometry} material={materials.blacktrim} position={[0.525, 0, 0]}/>
+      </RigidBody>
+      <mesh geometry={nodes.AxelRear.geometry} material={materials['blacktrim.001']} position={[-0.575, 0, 0]} />
+
+      <RigidBody colliders={"hull"} ref={tire1} onClick={rotate}>
         <mesh geometry={nodes.tire1.geometry} material={materials.blacktrim} position={[0.536, -0.193, -0.479]} rotation={[3.141, -0.006, -1.582]} scale={0.445} />
         <mesh geometry={nodes.shadeWhite_006.geometry} material={nodes.shadeWhite_006.material} position={[0.536, -0.193, -0.479]} rotation={[3.141, -0.006, -1.582]} scale={0.445} />
       </RigidBody>
-      {/* <RigidBody colliders={"hull"} ref={all4Tires}>
+      {/* <RigidBody colliders={"hull"}>
         <mesh geometry={nodes.tire2.geometry} material={materials.blacktrim} position={[0.535, -0.193, 0.474]} rotation={[0, 0, 1.559]} scale={0.445} />
         <mesh geometry={nodes.shadeWhite_006001.geometry} material={nodes.shadeWhite_006001.material} position={[0.535, -0.193, 0.474]} rotation={[0, 0, 1.559]} scale={0.445} />
       </RigidBody>
-      <RigidBody colliders={"hull"} ref={all4Tires}>
+      <RigidBody colliders={"hull"}>
         <mesh geometry={nodes.tire3.geometry} material={materials.blacktrim} position={[-0.568, -0.193, 0.474]} rotation={[0, 0, 1.559]} scale={0.445} />
         <mesh geometry={nodes.shadeWhite_006002.geometry} material={nodes.shadeWhite_006002.material} position={[-0.568, -0.193, 0.474]} rotation={[0, 0, 1.559]} scale={0.445} />
       </RigidBody>
-      <RigidBody colliders={"hull"} ref={all4Tires}>
+      <RigidBody colliders={"hull"}>
         <mesh geometry={nodes.tire4.geometry} material={materials.blacktrim} position={[-0.567, -0.193, -0.479]} rotation={[3.141, -0.006, -1.582]} scale={0.445} />
         <mesh geometry={nodes.shadeWhite_006003.geometry} material={nodes.shadeWhite_006003.material} position={[-0.567, -0.193, -0.479]} rotation={[3.141, -0.006, -1.582]} scale={0.445} />
       </RigidBody> */}

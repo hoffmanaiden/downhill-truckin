@@ -48,7 +48,7 @@ export default function Home() {
   return (
     <Canvas>
       <Suspense>
-        <Physics debug gravity={[0, -10, 0]} interpolation={false} colliders={false}>
+        <Physics debug gravity={[0, -50, 0]} interpolation={false} colliders={false}>
           <Stage intensity={0.5} shadows="contact" environment="city">
             <PerspectiveCamera makeDefault position={[20, 20, -20]} zoom={0.5} />
             <ambientLight />
