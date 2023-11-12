@@ -10,6 +10,7 @@ import Ecctrl, { EcctrlAnimation } from 'ecctrl'
 
 import { BrunoTruck } from './Bruno-truck'
 import { BrunoTruckAxel } from './Bruno-truck-axel'
+import { AxelOnly } from './Axel-wheel-only'
 import { Model } from './Semi-truck-1'
 
 export default function Home() {
@@ -62,7 +63,8 @@ export default function Home() {
 
             <Wheel/>
 
-            <BrunoTruckAxel scale={5}/>
+            {/* <BrunoTruckAxel scale={5}/> */}
+            <AxelOnly scale={5} position={[0, 10, 0]}/>
 
              
 
