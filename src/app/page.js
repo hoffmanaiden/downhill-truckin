@@ -9,8 +9,6 @@ import { Physics, RigidBody, CuboidCollider } from "@react-three/rapier";
 import Ecctrl, { EcctrlAnimation } from 'ecctrl'
 
 import { BrunoTruck } from './Bruno-truck'
-import { BrunoTruckAxel } from './Bruno-truck-axel'
-import { AxelOnly } from './Axel-wheel-only'
 import { Model } from './Semi-truck-1'
 
 export default function Home() {
@@ -63,10 +61,7 @@ export default function Home() {
 
             <Wheel/>
 
-            {/* <BrunoTruckAxel scale={5}/> */}
-            <AxelOnly scale={5} position={[0, 10, 0]}/>
-
-             
+             <BrunoTruck scale={5} />
 
             <CuboidCollider position={[0, -2, 0]} args={[20, 0.5, 20]} />
 
