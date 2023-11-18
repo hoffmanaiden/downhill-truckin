@@ -5,28 +5,45 @@ Command: npx gltfjsx@6.2.15 bruno-truck.glb
 
 import React, { useRef, useState } from 'react'
 import { useGLTF } from '@react-three/drei'
-import { RigidBody, CylinderCollider } from "@react-three/rapier"
+import { RigidBody, CylinderCollider, useRevoluteJoint, useFixedJoint } from "@react-three/rapier"
 
 
-function Axel({position}){
-  return(
-    <mesh position={position}>
-      <boxGeometry args={[0.25,0.25,0.25,]}/>
-      <meshStandardMaterial color='#383838'/>
-    </mesh>
-  )
-}
 
 export function BrunoTruck(props) {
-  const all4Tires = useRef();
+  // const all4Tires = useRef();
+  const chasses = useRef();
+  const frontAxel = useRef();
+  const tire1 = useRef();
   const { nodes, materials } = useGLTF('/bruno-truck.glb')
 
   const rotate = () => {
-    all4Tires.current.applyTorqueImpulse({ x: 0, y: 0, z: -100 }, true);
+    tire1.current.applyTorqueImpulse({ x: 0, y: 0, z: -100 }, true);
   }
+
+  // const joint = useFixedJoint(bodyA, bodyB, [
+  //   // Position of the joint in bodyA's local space
+  //   [0, 0, 0],
+  //   // Orientation of the joint in bodyA's local space
+  //   [0, 0, 0, 1],
+  //   // Position of the joint in bodyB's local space
+  //   [0, 0, 0],
+  //   // Orientation of the joint in bodyB's local space
+  //   [0, 0, 0, 1]
+  // ]);
+    
+  const joint = useRevoluteJoint(tire1, frontAxel, [
+    // Position of the joint in bodyA's local space
+    [0, 0, 0],
+    // Position of the joint in bodyB's local space
+    [0, 0, 0],
+    // Axis of the joint, expressed in the local-space of
+    // the rigid-bodies it is attached to. Cannot be [0,0,0].
+    [0, 1, 0]
+  ]);
+
   return (
-    <group {...props} dispose={null} onClick={rotate}>
-      {/* <RigidBody colliders={"hull"}>
+    <group {...props} onClick={rotate}>
+      <RigidBody colliders={"hull"}>
         <mesh geometry={nodes['left-headlight'].geometry} material={materials.light} position={[0.88, 0.214, -0.313]} rotation={[-1.573, 0, Math.PI / 2]} scale={0.422} />
         <mesh geometry={nodes['right-headlight'].geometry} material={materials.light} position={[0.88, 0.215, 0.292]} rotation={[-1.573, 0, Math.PI / 2]} scale={0.422} />
         <mesh geometry={nodes.toplight4.geometry} material={materials.light} position={[-0.204, 0.777, -0.304]} rotation={[-1.573, 0, Math.PI / 2]} scale={0.536} />
@@ -57,13 +74,18 @@ export function BrunoTruck(props) {
         <mesh geometry={nodes.shadeWhite_002001.geometry} material={materials.white} position={[0.35, 0.421, -0.528]} rotation={[-1.573, 0, Math.PI / 2]} scale={0.342} />
         <mesh geometry={nodes.shadeWhite_003001.geometry} material={materials.white} position={[0.35, 0.424, 0.499]} rotation={[1.569, 0, -Math.PI / 2]} scale={-0.342} />
         <mesh geometry={nodes.shadeWhite_007.geometry} material={materials.white} position={[-1.095, 0.199, -0.014]} rotation={[-0.157, -1.565, -1.737]} scale={0.445} />
-      </RigidBody> */}
-      <Axel position={[0.5,0,0]}/>
-      <RigidBody colliders={"hull"}>
+      </RigidBody>
+      <RigidBody colliders="cuboid" ref={frontAxel}>
+        <mesh >
+          <boxGeometry args={[0.25, 0.25, 0.25,]} />
+          <meshStandardMaterial color='#383838' />
+        </mesh>
+      </RigidBody>
+      <RigidBody colliders={"hull"} ref={tire1}>
         <mesh geometry={nodes.tire1.geometry} material={materials.blacktrim} position={[0.536, -0.193, -0.479]} rotation={[3.141, -0.006, -1.582]} scale={0.445} />
         <mesh geometry={nodes.shadeWhite_006.geometry} material={nodes.shadeWhite_006.material} position={[0.536, -0.193, -0.479]} rotation={[3.141, -0.006, -1.582]} scale={0.445} />
       </RigidBody>
-      <RigidBody colliders={"hull"}>
+      {/* <RigidBody colliders={"hull"}>
         <mesh geometry={nodes.tire2.geometry} material={materials.blacktrim} position={[0.535, -0.193, 0.474]} rotation={[0, 0, 1.559]} scale={0.445} />
         <mesh geometry={nodes.shadeWhite_006001.geometry} material={nodes.shadeWhite_006001.material} position={[0.535, -0.193, 0.474]} rotation={[0, 0, 1.559]} scale={0.445} />
       </RigidBody>
@@ -74,7 +96,7 @@ export function BrunoTruck(props) {
       <RigidBody colliders={"hull"}>
         <mesh geometry={nodes.tire4.geometry} material={materials.blacktrim} position={[-0.567, -0.193, -0.479]} rotation={[3.141, -0.006, -1.582]} scale={0.445} />
         <mesh geometry={nodes.shadeWhite_006003.geometry} material={nodes.shadeWhite_006003.material} position={[-0.567, -0.193, -0.479]} rotation={[3.141, -0.006, -1.582]} scale={0.445} />
-      </RigidBody>
+      </RigidBody> */}
     </group>
   )
 }
